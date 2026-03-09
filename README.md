@@ -89,8 +89,7 @@ JDBC
 ▶️ How to Run the Project
 
 Clone the repository
-
-git clone https://github.com/yourusername/bus-booking-system.git
+https://github.com/Satya1296/bus-ticket-booking-system
 
 Import the project into VS Code / any Java IDE
 
