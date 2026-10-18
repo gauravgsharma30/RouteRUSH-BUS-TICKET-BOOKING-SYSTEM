@@ -1,129 +1,293 @@
+
 package auth;
 
 import dashboard.AdminDashboard;
 import dashboard.Dashboard;
 import db.DBConnection;
+
 import java.awt.*;
+import java.awt.event.*;
 import java.sql.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class Login {
 
-    public Login(){
+    private final Color navy = new Color(9, 35, 70);
+    private final Color blue = new Color(37, 99, 235);
+    private final Color muted = new Color(100, 116, 139);
 
-        JFrame f = new JFrame("Bus Booking System");
-        f.setExtendedState(JFrame.MAXIMIZED_BOTH); // Full screen
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public Login() {
 
-        // ===== Background Panel =====
-        JPanel backgroundPanel = new JPanel() {
-            Image bg = new ImageIcon("Images/Bg.jpeg").getImage();
+        JFrame frame = new JFrame("Bus Booking System | Login");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1050, 680);
+        frame.setMinimumSize(new Dimension(850, 600));
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new GridLayout(1, 2));
 
+        // LEFT: Travel image panel
+        JPanel hero = new JPanel() {
+            Image image = new ImageIcon("Images/bus-banner.jpg").getImage();
+
+            @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
+
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(
+                        RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+                if (image.getWidth(this) > 0) {
+                    g2.drawImage(image, 0, 0,
+                            getWidth(), getHeight(), this);
+                } else {
+                    g2.setPaint(new GradientPaint(
+                            0, 0, navy,
+                            getWidth(), getHeight(),
+                            new Color(37, 99, 180)));
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+                }
+
+                g2.setColor(new Color(5, 28, 60, 155));
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.dispose();
             }
         };
 
-        backgroundPanel.setLayout(new GridBagLayout()); // CENTER PERFECTLY
-        f.setContentPane(backgroundPanel);
+        hero.setLayout(new BoxLayout(hero, BoxLayout.Y_AXIS));
+        hero.setBorder(new EmptyBorder(65, 38, 40, 30));
 
-        // ===== Login Card Panel =====
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(400, 350));
-        panel.setBackground(new Color(255, 255, 255, 220)); // Transparent white
-        panel.setLayout(null);
+        JLabel brand = new JLabel("BUS BOOKING SYSTEM");
+        brand.setFont(new Font("Arial", Font.BOLD, 17));
+        brand.setForeground(Color.WHITE);
+        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        Font headingFont = new Font("Times New Roman", Font.BOLD, 24);
-        Font labelFont = new Font("Times New Roman", Font.PLAIN, 18);
-        Font fieldFont = new Font("Times New Roman", Font.PLAIN, 16);
-        Font buttonFont = new Font("Times New Roman", Font.BOLD, 16);
+        hero.add(brand);
+        hero.add(Box.createVerticalGlue());
 
-        JLabel title = new JLabel("User Login");
-        title.setFont(headingFont);
-        title.setBounds(140,20,200,30);
+        JLabel heading = new JLabel(
+                "<html>Your journey,<br>our priority.</html>");
+        heading.setFont(new Font("Arial", Font.BOLD, 38));
+        heading.setForeground(Color.WHITE);
+        heading.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel u = new JLabel("Username");
-        u.setFont(labelFont);
-        u.setBounds(40,80,120,30);
+        JLabel description = new JLabel(
+                "<html>Discover routes, book your seats,<br>"
+                        + "and travel with comfort and confidence.</html>");
+        description.setFont(new Font("Arial", Font.PLAIN, 16));
+        description.setForeground(new Color(235, 242, 255));
+        description.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextField user = new JTextField();
-        user.setFont(fieldFont);
-        user.setBounds(160,80,180,30);
+        hero.add(heading);
+        hero.add(Box.createVerticalStrut(18));
+        hero.add(description);
+        hero.add(Box.createVerticalGlue());
 
-        JLabel p = new JLabel("Password");
-        p.setFont(labelFont);
-        p.setBounds(40,130,120,30);
+        JLabel footer = new JLabel("Travel far. Explore more.");
+        footer.setFont(new Font("Arial", Font.ITALIC, 15));
+        footer.setForeground(Color.WHITE);
+        footer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        hero.add(footer);
 
-        JPasswordField pass = new JPasswordField();
-        pass.setFont(fieldFont);
-        pass.setBounds(160,130,180,30);
+        // RIGHT: Login form
+        JPanel right = new JPanel(new GridBagLayout());
+        right.setBackground(new Color(248, 250, 254));
 
-        JLabel r = new JLabel("Role");
-        r.setFont(labelFont);
-        r.setBounds(40,180,120,30);
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+        form.setBackground(new Color(248, 250, 254));
+        form.setBorder(new EmptyBorder(25, 35, 25, 35));
 
-        String roles[]={"user","admin"};
-        JComboBox<String> roleBox = new JComboBox<>(roles);
-        roleBox.setFont(fieldFont);
-        roleBox.setBounds(160,180,180,30);
+        JLabel title = new JLabel("Welcome back!");
+        title.setFont(new Font("Arial", Font.BOLD, 30));
+        title.setForeground(navy);
+        title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton login = new JButton("Login");
-        login.setFont(buttonFont);
-        login.setBackground(new Color(30,144,255));
-        login.setForeground(Color.WHITE);
-        login.setBounds(60,240,120,40);
+        JLabel subtitle = new JLabel("Sign in to continue your journey");
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 14));
+        subtitle.setForeground(muted);
+        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton signup = new JButton("Sign Up");
-        signup.setFont(buttonFont);
-        signup.setBackground(new Color(34,139,34));
-        signup.setForeground(Color.WHITE);
-        signup.setBounds(210,240,120,40);
+        JTextField username = new JTextField();
+        JPasswordField password = new JPasswordField();
 
-        panel.add(title);
-        panel.add(u); panel.add(user);
-        panel.add(p); panel.add(pass);
-        panel.add(r); panel.add(roleBox);
-        panel.add(login); panel.add(signup);
+        styleField(username);
+        styleField(password);
 
-        backgroundPanel.add(panel); // Automatically centered
+        JComboBox<String> roleBox = new JComboBox<>(new String[] { "user", "admin" });
+        roleBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        roleBox.setBackground(Color.WHITE);
+        roleBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 43));
+        roleBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ===== Login Action =====
-        login.addActionListener(e->{
-            try{
-                Connection con = DBConnection.getConnection();
+        JLabel userLabel = createLabel("Username");
+        JLabel passLabel = createLabel("Password");
+        JLabel roleLabel = createLabel("Login as");
+
+        JCheckBox showPassword = new JCheckBox("Show password");
+        showPassword.setFont(new Font("Arial", Font.PLAIN, 12));
+        showPassword.setForeground(muted);
+        showPassword.setBackground(new Color(248, 250, 254));
+        showPassword.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        char defaultEcho = password.getEchoChar();
+
+        showPassword.addActionListener(e -> password.setEchoChar(
+                showPassword.isSelected() ? (char) 0 : defaultEcho));
+
+        JButton login = new JButton("Sign In");
+        styleButton(login, blue);
+
+        JButton signup = new JButton("Create Account");
+        styleButton(signup, navy);
+
+        form.add(title);
+        form.add(Box.createVerticalStrut(8));
+        form.add(subtitle);
+        form.add(Box.createVerticalStrut(30));
+
+        form.add(userLabel);
+        form.add(Box.createVerticalStrut(7));
+        form.add(username);
+        form.add(Box.createVerticalStrut(18));
+
+        form.add(passLabel);
+        form.add(Box.createVerticalStrut(7));
+        form.add(password);
+        form.add(Box.createVerticalStrut(5));
+        form.add(showPassword);
+        form.add(Box.createVerticalStrut(15));
+
+        form.add(roleLabel);
+        form.add(Box.createVerticalStrut(7));
+        form.add(roleBox);
+        form.add(Box.createVerticalStrut(24));
+
+        form.add(login);
+        form.add(Box.createVerticalStrut(12));
+        form.add(signup);
+
+        right.add(form);
+
+        frame.add(hero);
+        frame.add(right);
+
+        // LOGIN: preserve existing authentication logic
+        login.addActionListener(e -> {
+
+            if (username.getText().trim().isEmpty()
+                    || password.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(
+                        frame, "Please enter username and password.");
+                return;
+            }
+
+            try (Connection con = DBConnection.getConnection()) {
+
+                if (con == null) {
+                    JOptionPane.showMessageDialog(
+                            frame, "Database connection failed.");
+                    return;
+                }
 
                 PreparedStatement ps = con.prepareStatement(
-                        "SELECT * FROM users WHERE username=? AND password=? AND role=?"
-                );
+                        "SELECT * FROM users "
+                                + "WHERE username=? AND password=? AND role=?");
 
-                ps.setString(1,user.getText());
-                ps.setString(2,new String(pass.getPassword()));
-                ps.setString(3,roleBox.getSelectedItem().toString());
+                ps.setString(1, username.getText().trim());
+                ps.setString(2, new String(password.getPassword()));
+                ps.setString(3, roleBox.getSelectedItem().toString());
 
                 ResultSet rs = ps.executeQuery();
 
-                if(rs.next()){
-                    if(roleBox.getSelectedItem().toString().equals("admin")){
-                        new AdminDashboard(user.getText());
+                if (rs.next()) {
+
+                    String name = username.getText().trim();
+
+                    if (roleBox.getSelectedItem()
+                            .toString().equals("admin")) {
+                        new AdminDashboard(name);
                     } else {
-                        new Dashboard(user.getText());
+                        new Dashboard(name);
                     }
-                    f.dispose();
+
+                    frame.dispose();
+
                 } else {
-                    JOptionPane.showMessageDialog(f,"Invalid Login");
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Invalid username, password, or role.",
+                            "Login Failed",
+                            JOptionPane.WARNING_MESSAGE);
                 }
 
-            }catch(Exception ex){
+                rs.close();
+                ps.close();
+
+            } catch (Exception ex) {
                 ex.printStackTrace();
+
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Login error: " + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        signup.addActionListener(e->{
+        // SIGNUP
+        signup.addActionListener(e -> {
+            frame.dispose();
             new Signup();
-            f.dispose();
         });
 
-        f.setVisible(true);
+        frame.setVisible(true);
+    }
+
+    private JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 13));
+        label.setForeground(navy);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return label;
+    }
+
+    private void styleField(JTextField field) {
+        field.setFont(new Font("Arial", Font.PLAIN, 15));
+        field.setPreferredSize(new Dimension(320, 43));
+        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, 43));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(
+                        new Color(215, 225, 238)),
+                new EmptyBorder(8, 12, 8, 12)));
+        field.setBackground(Color.WHITE);
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+
+    private void styleButton(JButton button, Color color) {
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setForeground(Color.WHITE);
+        button.setBackground(color);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        button.setPreferredSize(new Dimension(320, 45));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(
+                Cursor.HAND_CURSOR));
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        Color original = color;
+
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(original.brighter());
+            }
+
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(original);
+            }
+        });
     }
 }

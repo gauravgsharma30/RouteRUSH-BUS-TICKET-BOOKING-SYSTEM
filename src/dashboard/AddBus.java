@@ -98,10 +98,15 @@ public class AddBus {
                 JOptionPane.showMessageDialog(f,"Bus Added Successfully");
                 f.dispose();
 
-            }catch(Exception ex){
-                JOptionPane.showMessageDialog(f,"Invalid Input! Please check time format (HH:MM:SS)");
-                ex.printStackTrace();
-            }
+            
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                        f,
+                        "Error: " + ex.getMessage()
+                    );
+                    ex.printStackTrace();
+                }
+
         });
 
         f.setVisible(true);

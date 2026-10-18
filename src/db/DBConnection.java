@@ -14,8 +14,7 @@ public class DBConnection {
             return DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/tickets",
                     "root",
-                    "Asritha@123"
-            );
+                    "root123");
 
         } catch (Exception e) {
             e.printStackTrace();
