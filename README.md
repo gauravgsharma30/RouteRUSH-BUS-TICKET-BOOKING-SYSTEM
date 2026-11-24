@@ -1,10 +1,9 @@
-🚌 Bus Ticket Booking System (Java)
-
 A Java-based Bus Ticket Booking System that allows users to search buses, book tickets, and manage bookings through a simple GUI. The system also includes an Admin module to manage buses and monitor the booking process.
 
 This project is built using Java Swing for the UI and MySQL for database storage.
 
 📌 Features
+
 👤 User Module
 
 User Registration and Login
@@ -21,6 +20,10 @@ Online payment simulation
 
 View booking confirmation with seat numbers
 
+View and manage bookings
+
+Access generated e-tickets
+
 🛠 Admin Module
 
 Admin Signup and Login
@@ -35,49 +38,124 @@ Manage bus information
 
 💾 Database Tables
 
-The system uses a MySQL database with the following tables:
+The system uses a MySQL database named tickets.
 
 Users Table
 
 Stores user login details.
 
-Column	Description
-id	User ID
-username	User name
-password	Password
+Column
+
+Description
+
+id
+
+User ID
+
+username
+
+User name
+
+password
+
+Password
+
 Admin Table
 
 Stores admin login credentials.
 
-Column	Description
-id	Admin ID
-username	Admin username
-password	Admin password
+Column
+
+Description
+
+id
+
+Admin ID
+
+username
+
+Admin username
+
+password
+
+Admin password
+
 Bus Table
 
 Stores bus details.
 
-Column	Description
-bus_id	Bus ID
-source	Source location
-destination	Destination location
-departure_time	Departure time
-journey_hours	Travel duration
-total_seats	Total number of seats
-price	Ticket price
+Column
+
+Description
+
+bus_id
+
+Bus ID
+
+source
+
+Source location
+
+destination
+
+Destination location
+
+departure_time
+
+Departure time
+
+journey_hours
+
+Travel duration
+
+total_seats
+
+Total number of seats
+
+price
+
+Ticket price
+
 Booking Table
 
 Stores ticket booking information.
 
-Column	Description
-booking_id	Booking ID
-username	User who booked
-bus_id	Bus ID
-passenger_name	Passenger name
-seat_number	Seat number
-booking_date	Booking date
-journey_date	Travel date
-payment_method	Payment type
+Column
+
+Description
+
+booking_id
+
+Booking ID
+
+username
+
+User who booked
+
+bus_id
+
+Bus ID
+
+passenger_name
+
+Passenger name
+
+seat_number
+
+Seat number
+
+booking_date
+
+Booking date
+
+journey_date
+
+Travel date
+
+payment_method
+
+Payment type
+
 ⚙️ Technologies Used
 
 Java
@@ -86,28 +164,33 @@ Java Swing (GUI)
 
 JDBC
 
+MySQL
+
+Git and GitHub
+
+VS Code
+
 ▶️ How to Run the Project
 
-Clone the repository
-https://github.com/Satya1296/bus-ticket-booking-system
+Clone the repository:
 
-Import the project into VS Code / any Java IDE
+git clone https://github.com/gauravgsharma30/RouteRUSH-BUS-TICKET-BOOKING-SYSTEM.git
 
-Create the MySQL database
+Import the project into VS Code or any Java IDE.
+
+Create the MySQL database:
 
 CREATE DATABASE tickets;
 
-Create required tables (users, admin, bus, booking)
+Create the required tables (users, admin, bus, booking).
 
 Update your database credentials in:
 
 DBConnection.java
 
+Make sure the MySQL JDBC Connector is configured.
+
 Run the project starting from the Login class.
-
-MySQL
-
-VS Code
 
 🎓 Academic Purpose
 
@@ -121,8 +204,16 @@ CRUD operations
 
 Booking system logic
 
-👩‍💻 Author
+Object-oriented programming
 
-Asritha
+Database management
+
+👨‍💻 Author
+
+Rakshit Rathi
 
 Java Project – Bus Ticket Booking System
+
+🔗 GitHub Repository
+
+RouteRUSH – Bus Ticket Booking System
