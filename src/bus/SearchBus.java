@@ -123,37 +123,18 @@ public class SearchBus {
         });
 
         // ===== BOOK =====
+        // ===== BOOK -> OPEN SEAT GRID =====
         bookBtn.addActionListener(e -> {
-
-            if (busResult.getSelectedItem() == null)
+            if (busResult.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(f, "Please select a bus first.");
                 return;
+            }
 
             String selected = busResult.getSelectedItem().toString();
-            String busId = selected.split("\\|")[0].trim();
+            int busId = Integer.parseInt(selected.split("\\|")[0].trim());
 
-            String passenger = JOptionPane.showInputDialog(
-                    f, "Enter passenger name:");
-
-            if (passenger == null || passenger.trim().isEmpty()) {
-                return;
-            }
-
-            String countStr = JOptionPane.showInputDialog(
-                    f, "Enter number of tickets:");
-
-            if (countStr == null) {
-                return;
-            }
-
-            try {
-                int ticketCount = Integer.parseInt(countStr.trim());
-
-                new BookTicket(username, busId, passenger.trim(), ticketCount);
-                f.dispose();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(f, "Please enter a valid ticket count.");
-            }
+            f.setVisible(false);
+            new SeatGridFrame(username, busId, selected, f).setVisible(true);
         });
 
     }

@@ -278,7 +278,9 @@ public class SearchBusFinal {
         destField.addActionListener(e -> searchAction.run());
 
         // BOOK SELECTED BUS
+        // BOOK SELECTED BUS
         bookBtn.addActionListener(e -> {
+
             int selectedRow = table.getSelectedRow();
 
             if (selectedRow == -1) {
@@ -290,61 +292,18 @@ public class SearchBusFinal {
             int row = table.convertRowIndexToModel(selectedRow);
 
             String busId = model.getValueAt(row, 0).toString();
-            int available;
 
-            try {
-                available = Integer.parseInt(
-                        model.getValueAt(row, 6).toString());
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(f, "Invalid seat information.");
-                return;
-            }
+            String busSummary = model.getValueAt(row, 1) + " | " +
+                    model.getValueAt(row, 2) + " to " +
+                    model.getValueAt(row, 3);
 
-            if (available <= 0) {
-                JOptionPane.showMessageDialog(
-                        f, "No seats are available on this bus.");
-                return;
-            }
+            f.setVisible(false);
 
-            String passenger = JOptionPane.showInputDialog(
-                    f, "Enter passenger name:");
-
-            if (passenger == null) {
-                return;
-            }
-
-            passenger = passenger.trim();
-
-            if (passenger.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        f, "Passenger name cannot be empty.");
-                return;
-            }
-
-            String ticketStr = JOptionPane.showInputDialog(
-                    f, "Enter number of tickets (1-" + available + "):");
-
-            if (ticketStr == null) {
-                return;
-            }
-
-            try {
-                int tickets = Integer.parseInt(ticketStr.trim());
-
-                if (tickets < 1 || tickets > available) {
-                    JOptionPane.showMessageDialog(
-                            f,
-                            "Enter a ticket count between 1 and "
-                                    + available + ".");
-                    return;
-                }
-
-                new BookTicket(username, busId, passenger, tickets);
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(
-                        f, "Please enter a valid whole number.");
-            }
+            new SeatGridFrame(
+                    username,
+                    Integer.parseInt(busId),
+                    busSummary,
+                    f).setVisible(true);
         });
 
         f.setLocationRelativeTo(null);

@@ -1,9 +1,11 @@
+
 package bus;
 
 import db.DBConnection;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
@@ -116,7 +118,7 @@ public class MyBookings {
                 new Color(226, 232, 241)));
         scroll.getViewport().setBackground(Color.WHITE);
 
-        // EMPTY STATE / TABLE AREA
+        // TABLE HEADING
         JLabel tableTitle = new JLabel("Booking History");
         tableTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         tableTitle.setForeground(NAVY);
@@ -135,19 +137,21 @@ public class MyBookings {
         tablePanel.add(tableHeading, BorderLayout.NORTH);
         tablePanel.add(scroll, BorderLayout.CENTER);
 
-        // FOOTER
+        // FOOTER BUTTONS
         JButton refreshBtn = createButton("Refresh", BLUE);
+        JButton ticketBtn = createButton("View E-Ticket", new Color(28, 145, 100));
         JButton closeBtn = createButton("Close", NAVY);
 
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(Color.WHITE);
 
-        JLabel hint = new JLabel("Your booking records are shown below.");
+        JLabel hint = new JLabel("Select a booking to view its e-ticket.");
         hint.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         hint.setForeground(new Color(110, 122, 142));
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         actions.setBackground(Color.WHITE);
+        actions.add(ticketBtn);
         actions.add(refreshBtn);
         actions.add(closeBtn);
 
@@ -163,6 +167,7 @@ public class MyBookings {
 
         // LOAD BOOKINGS
         Runnable loadBookings = () -> {
+
             model.setRowCount(0);
             status.setText("Loading bookings...");
 
@@ -172,9 +177,14 @@ public class MyBookings {
             try (Connection con = DBConnection.getConnection();
                     PreparedStatement ps = con.prepareStatement(sql)) {
 
+                if (con == null) {
+                    throw new SQLException("Database connection failed.");
+                }
+
                 ps.setString(1, username);
 
                 try (ResultSet rs = ps.executeQuery()) {
+
                     while (rs.next()) {
                         model.addRow(new Object[] {
                                 rs.getInt("booking_id"),
@@ -191,10 +201,11 @@ public class MyBookings {
                 if (model.getRowCount() == 0) {
                     hint.setText("No bookings yet. Search for a bus to get started.");
                 } else {
-                    hint.setText("Select a column header to sort your bookings.");
+                    hint.setText("Select a booking and click View E-Ticket.");
                 }
 
             } catch (Exception ex) {
+
                 ex.printStackTrace();
                 status.setText("Could not load bookings");
 
@@ -207,6 +218,39 @@ public class MyBookings {
             }
         };
 
+        // VIEW SELECTED E-TICKET
+        ticketBtn.addActionListener(e -> {
+
+            int selectedRow = table.getSelectedRow();
+
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(
+                        f,
+                        "Please select a booking first.",
+                        "No Booking Selected",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            // Important because the table supports sorting.
+            int row = table.convertRowIndexToModel(selectedRow);
+
+            int bookingId = Integer.parseInt(
+                    model.getValueAt(row, 0).toString());
+
+            showETicket(f, username, bookingId);
+        });
+
+        // DOUBLE CLICK ALSO OPENS TICKET
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    ticketBtn.doClick();
+                }
+            }
+        });
+
         refreshBtn.addActionListener(e -> loadBookings.run());
         closeBtn.addActionListener(e -> f.dispose());
 
@@ -216,7 +260,94 @@ public class MyBookings {
         f.setVisible(true);
     }
 
+    // FETCH BOOKING DETAILS AND OPEN E-TICKET
+    private void showETicket(JFrame parent, String username, int bookingId) {
+
+        String sql = "SELECT b.bus_id, b.passenger_name, b.seat_number, " +
+                "b.journey_date, b.payment_method, " +
+                "bus.departure_time, bus.journey_hours, bus.price " +
+                "FROM booking b " +
+                "JOIN bus ON b.bus_id = bus.bus_id " +
+                "WHERE b.booking_id = ? AND b.username = ?";
+
+        try (Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+            if (con == null) {
+                throw new SQLException("Database connection failed.");
+            }
+
+            ps.setInt(1, bookingId);
+            ps.setString(2, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (!rs.next()) {
+                    JOptionPane.showMessageDialog(
+                            parent,
+                            "Booking details not found.",
+                            "Ticket Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String busId = String.valueOf(rs.getInt("bus_id"));
+                String passenger = rs.getString("passenger_name");
+                String seat = String.valueOf(rs.getInt("seat_number"));
+
+                String journeyDate = rs.getDate("journey_date").toString();
+                String paymentMethod = rs.getString("payment_method");
+
+                Time departureTime = rs.getTime("departure_time");
+                int hours = rs.getInt("journey_hours");
+                double amount = rs.getDouble("price");
+
+                // Calculate arrival time
+                Time arrivalTime = null;
+
+                if (departureTime != null) {
+                    long arrivalMillis = departureTime.getTime()
+                            + (hours * 60L * 60L * 1000L);
+
+                    arrivalTime = new Time(arrivalMillis);
+                }
+
+                SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+
+                String departure = departureTime != null
+                        ? sdf.format(departureTime)
+                        : "Not Set";
+
+                String arrival = arrivalTime != null
+                        ? sdf.format(arrivalTime)
+                        : "Not Set";
+
+                // Open the same e-ticket used after booking
+                new ETicket(
+                        busId,
+                        passenger,
+                        seat,
+                        journeyDate,
+                        departure,
+                        arrival,
+                        paymentMethod,
+                        amount);
+            }
+
+        } catch (Exception ex) {
+
+            ex.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                    parent,
+                    "Unable to open e-ticket:\n" + ex.getMessage(),
+                    "Ticket Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private JButton createButton(String text, Color base) {
+
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setForeground(Color.WHITE);
@@ -227,6 +358,7 @@ public class MyBookings {
         button.setOpaque(true);
 
         button.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(base.brighter());
